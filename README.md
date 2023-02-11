@@ -7,18 +7,15 @@ Usage:
 Enter any one of the following commands in the chat window...
 
 * /fcp
-* /ffsa
-* /ffssa
-* /rb
-* /rib
-* /fc
-* /firecracker
-/mca
-/iba
-/eha
-/tu
-/ihdpc
-/goli
+* /ffsa or /ffssa
+* /rb or /rib
+* /fc or /firecracker
+* /mca
+* /iba
+* /eha
+* /tu
+* /ihdpc
+* /goli
 
 For corvus widowmakers the station is the parameter: /cwm "Bractus D-9"
 
