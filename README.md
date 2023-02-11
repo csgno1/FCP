@@ -6,13 +6,13 @@ Vendetta Online manufacturing helper plugin, mainly for items where many of the 
 Usage: 
 Enter any one of the following commands in the chat window...
 
-/fcp
-/ffsa
-/ffssa
-/rb
-/rib
-/fc
-/firecracker
+* /fcp
+* /ffsa
+* /ffssa
+* /rb
+* /rib
+* /fc
+* /firecracker
 /mca
 /iba
 /eha
