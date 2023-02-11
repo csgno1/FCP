@@ -17,13 +17,13 @@
 -- version: 1.0 2014/06/15  - Initial release
 
 -- Planned improvements:
---	TU mine launcher
+--	/TTM command for final trident mission
 --	
 
 -- Dependancies: none
 
 -- usage:
--- /fcp or /ffsa or /ffssa or /rb or /rib or fc or /firecracker or /mca or /iba or /mmc
+-- /fcp or /ffsa or /ffssa or /rb or /rib or fc or /firecracker or /mca or /iba or /mmc or /tu or /ihdpc or /goli
 -- For corvus widowmakers the station is the parameter:  /cwm "Bractus D-9"
 -- To see more detail after typing one of the above, toggle the console by typing ' and look at the bottom
 
