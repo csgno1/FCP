@@ -2,7 +2,10 @@
 
 -- VO manufacturing helper plugin, mainly for items where many of the same are needed
 
--- version: 1.12 2023/01/26 - added Goliath /goli
+-- version: 1.15 2026/02/14 - Bug fixes for the /goli section
+-- version: 1.14 2024/01/12 - added /dbha (beta)
+-- version: 1.13 2024/01/07 - added /engine
+-- version: 1.12 2023/01/26 - added Goliath /goli (beta)
 -- version: 1.11 2021/09/21 - added PCB
 -- version: 1.10 2017/12/13 - added IHDPC
 -- version: 1.09 2016/11/03 - added TU mine launchers
@@ -18,12 +21,12 @@
 
 -- Planned improvements:
 --	/TTM command for final trident mission
---	
+--	/reactor
 
 -- Dependancies: none
 
 -- usage:
--- /fcp or /ffsa or /ffssa or /rb or /rib or fc or /firecracker or /mca or /iba or /mmc or /tu or /ihdpc or /goli
+-- /fcp or /ffsa or /ffssa or /rb or /rib or /fc or /firecracker or /mca or /iba or /mmc or /engine or /goli or /dbha
 -- For corvus widowmakers the station is the parameter:  /cwm "Bractus D-9"
 -- To see more detail after typing one of the above, toggle the console by typing ' and look at the bottom
 
@@ -59,6 +62,54 @@ function harpo_fcp(_, args)
 		end
 	end
 	sectorprint("Can currently build maximum of " .. math.floor(lowest) .. " FCP using current inventory in i8, limited by " .. limiter)
+end
+
+function harpo_engine(_, args)
+	local tally = {}
+	local location = ""
+	local iname = ""
+	local qty = 0
+	local lowest = 9999
+	local limiter = ""
+	tally.sss = 0; tally.fcp = 0; tally.lanth = 0; tally.ffsa = 0; tally.helio = 0; tally.HydraulicTappets = 0; 
+	tally.ishik = 0;  tally.DataLinkConnectors = 0; tally.coolant = 0; tally.EnergyConversionModules = 0;
+	tally.PowerRegulators = 0; tally.sh = 0; tally.xith = 0; tally.ferric = 0; tally.carbonic = 0;
+	console_print("Item, Number of engine worth of item...")
+	for i,v in PlayerInventoryPairs() do 
+		location = ShortLocationStr(SplitStationID(GetInventoryItemLocation(i)))
+		if location == "Latos I-8" then
+			iname = GetInventoryItemName(i)
+				qty = GetInventoryItemQuantity(i)
+				-- console_print(location .. " " .. iname .. " " .. qty)
+				if iname == "Synthetic Silksteel" 				then tally.sss = tally.sss + qty / 8 end
+				if iname == "Fused Composite Plating" 			then tally.fcp = tally.fcp + qty / 8 end
+				if iname == "Fluid Formable Silksteel Alloy" 	then tally.ffsa = tally.ffsa + qty / 25 end
+				if iname == "Hydraulic Tappets" 				then 
+											tally.HydraulicTappets = tally.HydraulicTappets + qty / 16 end
+				if iname == "Premium Ishik Ore" 				then tally.ishik = tally.ishik + qty / 16 end
+				if iname == "Heliocene Ore" 					then tally.helio = tally.helio + qty / 8 end
+				if iname == "Lanthanic Ore" 					then tally.lanth = tally.lanth + qty / 22 end
+				if iname == "Data Link Connectors" 				then 
+											tally.DataLinkConnectors = tally.DataLinkConnectors + qty / 16 end
+				if iname == "Coolant" 							then tally.coolant = tally.coolant + qty / 250 end
+				if iname == "Energy Conversion Module" 			then 
+											tally.EnergyConversionModules = tally.EnergyConversionModules + qty / 4 end
+				if iname == "Power Regulators" 					then 
+											tally.PowerRegulators = tally.PowerRegulators + qty / 90 end
+				if iname == "Synthetic Hydrocarbons" 			then tally.sh = tally.sh + qty / 22 end
+				if iname == "Premium Xithricite Ore" 			then tally.xith = tally.xith + qty / 50 end
+				if iname == "Premium Ferric Ore" 				then tally.ferric = tally.ferric + qty / 180 end
+				if iname == "Premium Carbonic Ore" 				then tally.carbonic = tally.carbonic + qty / 240 end
+		end
+	end
+	for i, v in pairs(tally) do
+		console_print(i .. " -> " .. math.floor(v))
+		if math.floor(v) < lowest then
+			lowest = math.floor(v)
+			limiter = i
+		end
+	end
+	sectorprint("Can currently build maximum of " .. math.floor(lowest) .. " engines using current inventory in i8, limited by " .. limiter)
 end
 
 function harpo_ihdpc(_, args)
@@ -541,38 +592,20 @@ function harpo_goli(_, args)
 	local lowest = 9999
 	local limiter = ""
 
-	--Basic Targeting Systems 			3
-	--Advanced Targeting System 			2
-	--Instrumentation Panel 			10
-	--Life Support System 				2
-	--Navigation Unit 				4
-	--Pilot Safety Harness 				2
-	--Ship Paint 					45
-	--Premium Carbonic Ore 				600
-	--Premium Ferric Ore 				300
-	--Premium Ishik Ore 				100
-	--Premium Silicate ore 				400
-	--Premium VanAzek Ore 				80
-	--Premium Xithricite Ore 			150
-	--Denic Ore 					100
-	--Heliocene Ore 				75
-	--Lanthanic Ore 				100
-	--Apicene Ore 					60
-	--200MW Toroidal Hyper-Plasma Reactor 		1
-	--80MW Inverted Pulse Displacement Engine 	1
-	--Docking Bay Hanger Assembly 			1
-	--Engine Pylon Assembly 			1
-	--External Hull Assembly 			2
-	--Internal Bulkhead Assembly 			2
-	--Milanar Master Computing System 		1
-	--Milanar Optical Sensor 			1
-	--Artemis Processor Core 			100
-
-	tally.BasicTargetingSystems = 0; tally.AdvancedTargetingSystem = 0; tally.InstrumentationPanel = 0; tally.LifeSupportSystem = 0; tally.NavigationUnit = 0; 
-	tally.PilotSafetyHarness = 0; tally.ShipPaint = 0; tally.PremiumCarbonicOre = 0; tally.PremiumFerricOre = 0; tally.PremiumIshikOre = 0; tally.PremiumSilicateOre = 0; 
-	tally.PremiumVanAzekOre = 0; tally.PremiumXithriciteOre = 0; tally.DenicOre = 0; tally.HelioceneOre = 0; tally.LanthanicOre = 0; tally.ApiceneOre = 0; 
-	tally.ToroidalHyperPlasmaReactor = 0; tally.InvertedPulseDisplacementEngine = 0; tally.DockingBayHangerAssembly = 0; tally.EnginePylonAssembly = 0; 
-	tally.ExternalHullAssembly = 0; tally.InternalBulkheadAssembly = 0; tally.MilanarMasterComputingSystem = 0; tally.MilanarOpticalSensor = 0; tally.ArtemisProcessorCore = 0;
+	tally.ArtemisProcessorCore = 0; tally.z200MWToroidalHyperPlasmaReactor = 0; tally.z80MWInvertedPulseDisplacementEngine = 0;
+	tally.DockingBayHangerAssembly = 0; tally.EnginePylonAssembly = 0; tally.ExternalHullAssembly = 0;
+	tally.FluidFormableSilksteelAlloy = 0; tally.FusedCompositePlating = 0; tally.InternalBulkheadAssembly = 0;
+	tally.MilanarMasterComputingSystem = 0; tally.MilanarOpticalSensor = 0; tally.AdvancedTargetingSystems = 0;
+	tally.AirlockMaintenanceSupplies = 0; tally.BasicTargetingSystems = 0; tally.BearingGrease = 0;
+	tally.CommercialTextiles = 0; tally.CoolingSystems = 0; tally.DataLinkConnectors = 0;
+	tally.DopplerArray = 0; tally.EscapeHatchSystem = 0; tally.ExhaustManifold = 0;
+	tally.ExternalEquipmentMounts = 0; tally.ExternalThermalCouplers = 0; tally.ExtravehicularSuits = 0;
+	tally.FireSuppressionsystem = 0; tally.FlightAssistControlModule = 0; tally.FrequencyModulators = 0;
+	tally.Gyroscopes = 0; tally.InstrumentationPanel = 0; tally.LifeSupportSystem = 0; tally.NavigationUnit = 0; 
+	tally.OuterHullPlate = 0; tally.OxygenRecyclingSystem = 0; tally.PilotSafetyHarness = 0; tally.PowerRegulators = 0;
+	tally.ShipPaint = 0; tally.StabilizingSystems = 0; tally.HullPanels = 0; tally.ApiceneOre = 0; tally.DenicOre = 0;
+	tally.HelioceneOre = 0; tally.LanthanicOre = 0; tally.PremiumFerricOre = 0; tally.PremiumSilicateOre = 0;
+	tally.PremiumVanAzekOre = 0; tally.PremiumXithriciteOre = 0; tally.PremiumCarbonicOre = 0; tally.PremiumIshikOre = 0;
 
 	console_print("Item, Number of Goliaths worth of item...")
 	for i,v in PlayerInventoryPairs() do 
@@ -580,32 +613,54 @@ function harpo_goli(_, args)
 		if location == "Latos M-7" then
 			iname = GetInventoryItemName(i)
 			qty = GetInventoryItemQuantity(i)
-			if iname == "Lanthanic Ore"				then tally.LanthanicOre = tally.LanthanicOre + qty / 100 end
-			if iname == "Basic Targeting Systems"			then tally.BasicTargetingSystems = tally.BasicTargetingSystems + qty / 3 end
-			if iname == "Advanced Targeting Systems"		then tally.AdvancedTargetingSystems = tally.AdvancedTargetingSystems + qty / 2 end
-			if iname == "Instrumentation Panel"			then tally.InstrumentationPanel = tally.InstrumentationPanel + qty / 10 end
-			if iname == "Life Support System"			then tally.LifeSupportSystem = tally.LifeSupportSystem + qty / 2 end
-			if iname == "Navigation Unit"				then tally.NavigationUnit = tally.NavigationUnit + qty / 14 end
-			if iname == "Pilot Safety Harness"			then tally.PilotSafetyHarness = tally.PilotSafetyHarness + qty / 2 end
-			if iname == "Ship Paint"				then tally.ShipPaint = tally.ShipPaint + qty / 45 end
-			if iname == "Premium Carbonic Ore"			then tally.PremiumCarbonicOre = tally.PremiumCarbonicOre + qty / 600 end
-			if iname == "Premium Ferric Ore"			then tally.PremiumFerricOre = tally.PremiumFerricOre + qty / 300 end
-			if iname == "Premium Ishik Ore"				then tally.PremiumIshikOre = tally.PremiumIshikOre + qty / 100 end
-			if iname == "Premium Silicate Ore"			then tally.PremiumSilicateOre = tally.PremiumSilicateOre + qty / 400 end
-			if iname == "Premium VanAzek Ore"			then tally.PremiumVanAzekOre = tally.PremiumVanAzekOre + qty / 80 end
-			if iname == "Premium Xithricite Ore"			then tally.PremiumXithriciteOre = tally.PremiumXithriciteOre + qty / 150 end
-			if iname == "Denic Ore"					then tally.DenicOre = tally.DenicOre + qty / 100 end
-			if iname == "Heliocene Ore"				then tally.HelioceneOre = tally.HelioceneOre + qty / 75 end
-			if iname == "Apicene Ore"				then tally.ApiceneOre = tally.ApiceneOre + qty / 60 end
-			if iname == "200MW Toroidal Hyper-Plasma Reactor"	then tally.ToroidalHyperPlasmaReactor = tally.ToroidalHyperPlasmaReactor + qty / 1 end
-			if iname == "80MW Inverted Pulse Displacement Engine"	then tally.InvertedPulseDisplacementEngine = tally.InvertedPulseDisplacementEngine + qty / 1 end
-			if iname == "Docking Bay Hanger Assembly"		then tally.DockingBayHangerAssembly = tally.DockingBayHangerAssembly + qty / 1 end
-			if iname == "Engine Pylon Assembly"			then tally.EnginePylonAssembly = tally.EnginePylonAssembly + qty / 1 end
-			if iname == "External Hull Assembly"			then tally.ExternalHullAssembly = tally.ExternalHullAssembly + qty / 2 end
-			if iname == "Internal Bulkhead Assembly"		then tally.InternalBulkheadAssembly = tally.InternalBulkheadAssembly + qty / 2 end
-			if iname == "Milanar Master Computing System"		then tally.MilanarMasterComputingSystem = tally.MilanarMasterComputingSystem + qty / 1 end
-			if iname == "Milanar Optical Sensor"			then tally.MilanarOpticalSensor = tally.MilanarOpticalSensor + qty / 1 end
-			if iname == "Artemis Processor Core"			then tally.ArtemisProcessorCore = tally.ArtemisProcessorCore + qty / 100 end
+			if iname == "Artemis Processor Core" then tally.ArtemisProcessorCore = tally.ArtemisProcessorCore + qty / 100 end
+			if iname == "200MW Toroidal Hyper-Plasma Reactor" then tally.z200MWToroidalHyperPlasmaReactor = tally.z200MWToroidalHyperPlasmaReactor + qty / 1 end
+			if iname == "80MW Inverted Pulse Displacement Engine" then tally.z80MWInvertedPulseDisplacementEngine = tally.z80MWInvertedPulseDisplacementEngine + qty / 1 end
+			if iname == "Docking Bay Hanger Assembly" then tally.DockingBayHangerAssembly = tally.DockingBayHangerAssembly + qty / 1 end
+			if iname == "Engine Pylon Assembly" then tally.EnginePylonAssembly = tally.EnginePylonAssembly + qty / 1 end
+			if iname == "External Hull Assembly" then tally.ExternalHullAssembly = tally.ExternalHullAssembly + qty / 2 end
+			if iname == "Fluid Formable Silksteel Alloy" then tally.FluidFormableSilksteelAlloy = tally.FluidFormableSilksteelAlloy + qty / 8 end
+			if iname == "Fused Composite Plating" then tally.FusedCompositePlating = tally.FusedCompositePlating + qty / 10 end
+			if iname == "Internal Bulkhead Assembly" then tally.InternalBulkheadAssembly = tally.InternalBulkheadAssembly + qty / 2 end
+			if iname == "Milanar Master Computing System" then tally.MilanarMasterComputingSystem = tally.MilanarMasterComputingSystem + qty / 1 end
+			if iname == "Milanar Optical Sensor" then tally.MilanarOpticalSensor = tally.MilanarOpticalSensor + qty / 1 end
+			if iname == "Advanced Targeting Systems" then tally.AdvancedTargetingSystems = tally.AdvancedTargetingSystems + qty / 2 end
+			if iname == "Airlock Maintenance Supplies" then tally.AirlockMaintenanceSupplies = tally.AirlockMaintenanceSupplies + qty / 3 end
+			if iname == "Basic Targeting Systems" then tally.BasicTargetingSystems = tally.BasicTargetingSystems + qty / 3 end
+			if iname == "Bearing Grease" then tally.BearingGrease = tally.BearingGrease + qty / 7 end
+			if iname == "Commercial Textiles" then tally.CommercialTextiles = tally.CommercialTextiles + qty / 4 end
+			if iname == "Cooling Systems" then tally.CoolingSystems = tally.CoolingSystems + qty / 12 end
+			if iname == "Data Link Connectors" then tally.DataLinkConnectors = tally.DataLinkConnectors + qty / 140 end
+			if iname == "Doppler Array" then tally.DopplerArray = tally.DopplerArray + qty / 2 end
+			if iname == "Escape Hatch System" then tally.EscapeHatchSystem = tally.EscapeHatchSystem + qty / 1 end
+			if iname == "Exhaust Manifold" then tally.ExhaustManifold = tally.ExhaustManifold + qty / 2 end
+			if iname == "External Equipment Mounts" then tally.ExternalEquipmentMounts = tally.ExternalEquipmentMounts + qty / 6 end
+			if iname == "External Thermal Couplers" then tally.ExternalThermalCouplers = tally.ExternalThermalCouplers + qty / 6 end
+			if iname == "Extravehicular Suits" then tally.ExtravehicularSuits = tally.ExtravehicularSuits + qty / 1 end
+			if iname == "Fire-suppression system" then tally.FireSuppressionsystem = tally.FireSuppressionsystem + qty / 2 end
+			if iname == "Flight Assist Control Module" then tally.FlightAssistControlModule = tally.FlightAssistControlModule + qty / 1 end
+			if iname == "Frequency Modulators" then tally.FrequencyModulators = tally.FrequencyModulators + qty / 2 end
+			if iname == "Gyroscopes" then tally.Gyroscopes = tally.Gyroscopes + qty / 2 end
+			if iname == "Instrumentation Panel" then tally.InstrumentationPanel = tally.InstrumentationPanel + qty / 10 end
+			if iname == "Life Support System" then tally.LifeSupportSystem = tally.LifeSupportSystem + qty / 2 end
+			if iname == "Navigation Unit" then tally.NavigationUnit = tally.NavigationUnit + qty / 4 end
+			if iname == "Outer Hull Plate" then tally.OuterHullPlate = tally.OuterHullPlate + qty / 25 end
+			if iname == "Oxygen Recycling System" then tally.OxygenRecyclingSystem = tally.OxygenRecyclingSystem + qty / 6 end
+			if iname == "Pilot Safety Harness" then tally.PilotSafetyHarness = tally.PilotSafetyHarness + qty / 2 end
+			if iname == "Power Regulators" then tally.PowerRegulators = tally.PowerRegulators + qty / 30 end
+			if iname == "Ship Paint" then tally.ShipPaint = tally.ShipPaint + qty / 45 end
+			if iname == "Stabilizing Systems" then tally.StabilizingSystems = tally.StabilizingSystems + qty / 22 end
+			if iname == "Hull Panels" then tally.HullPanels = tally.HullPanels + qty / 40 end
+			if iname == "Apicene Ore" then tally.ApiceneOre = tally.ApiceneOre + qty / 60 end
+			if iname == "Denic Ore" then tally.DenicOre = tally.DenicOre + qty / 100 end
+			if iname == "Heliocene Ore" then tally.HelioceneOre = tally.HelioceneOre + qty / 75 end
+			if iname == "Lanthanic Ore" then tally.LanthanicOre = tally.LanthanicOre + qty / 100 end
+			if iname == "Premium Ferric Ore" then tally.PremiumFerricOre = tally.PremiumFerricOre + qty / 300 end
+			if iname == "Premium Silicate Ore" then tally.PremiumSilicateOre = tally.PremiumSilicateOre + qty / 400 end
+			if iname == "Premium VanAzek Ore" then tally.PremiumVanAzekOre = tally.PremiumVanAzekOre + qty / 80 end
+			if iname == "Premium Xithricite Ore" then tally.PremiumXithriciteOre = tally.PremiumXithriciteOre + qty / 150 end
+			if iname == "Premium Carbonic Ore" then tally.PremiumCarbonicOre = tally.PremiumCarbonicOre + qty / 600 end
+			if iname == "Premium Ishik Ore" then tally.PremiumIshikOre = tally.PremiumIshikOre + qty / 100 end
 		end
 	end
 	for i, v in pairs(tally) do
@@ -616,6 +671,275 @@ function harpo_goli(_, args)
 		end
 	end
 	sectorprint("Can currently build maximum of " .. math.floor(lowest) .. " Goliaths using current inventory in m7, limited by " .. limiter)
+end
+
+function harpo_superlight(_, args)
+	local tally = {}
+	local location = ""
+	local iname = ""
+	local qty = 0
+	local lowest = 9999
+	local limiter = ""
+	tally.InstrumentationPanels = 0; tally.Carbonic = 0; tally.VanAzek = 0;	tally.Ferric = 0; tally.Silicate = 0; tally.Xith = 0;
+	tally.Pentric = 0; tally.ThrustRegulators = 0; tally.ThermalInsulatorTiles = 0; tally.EngineMounts = 0; 
+	tally.DataLinkConnectors = 0; tally.PilotSafetyHarness = 0; tally.NavigationUnits = 0; tally.PropellantActuators = 0;
+	tally.OuterHullPlate = 0; tally.HullPanels = 0; tally.GuardianProcessor = 0; tally.ArtemisProcessor = 0;
+	console_print("Item, Number of Superlights worth of item...")
+	for i,v in PlayerInventoryPairs() do 
+		location = ShortLocationStr(SplitStationID(GetInventoryItemLocation(i)))
+		if location == "Odia M-14" then
+			iname = GetInventoryItemName(i)
+			qty = GetInventoryItemQuantity(i)
+			if iname == "Instrumentation Panel"		then tally.InstrumentationPanels = tally.InstrumentationPanels + qty / 2 end
+			if iname == "Premium Carbonic Ore"		then tally.Carbonic = tally.Carbonic + qty / 70 end
+			if iname == "Premium VanAzek Ore"		then tally.VanAzek = tally.VanAzek + qty / 50 end
+			if iname == "Premium Ferric Ore"		then tally.Ferric = tally.Ferric + qty / 60 end
+			if iname == "Premium Silicate Ore"		then tally.Silicate = tally.Silicate + qty / 19 end
+			if iname == "Premium Xithricite Ore"	then tally.Xith = tally.Xith + qty / 45 end
+			if iname == "Pentric Ore"				then tally.Pentric = tally.Pentric + qty / 10 end
+			if iname == "Thrust Regulators"			then tally.ThrustRegulators = tally.ThrustRegulators + qty / 4 end
+			if iname == "Thermal Insulator Tiles"	then tally.ThermalInsulatorTiles = tally.ThermalInsulatorTiles + qty / 15 end
+			if iname == "Engine Mounts"				then tally.EngineMounts = tally.EngineMounts + qty / 8 end
+			if iname == "Data Link Connectors"		then tally.DataLinkConnectors = tally.DataLinkConnectors + qty / 6 end
+			if iname == "Pilot Safety Harness"		then tally.PilotSafetyHarness = tally.PilotSafetyHarness + qty / 1 end
+			if iname == "Navigation Unit" 			then tally.NavigationUnits = tally.NavigationUnits + qty / 2 end
+			if iname == "Propellant Actuators"		then tally.PropellantActuators = tally.PropellantActuators + qty / 4 end
+			if iname == "Outer Hull Plate"			then tally.OuterHullPlate = tally.OuterHullPlate + qty / 6 end
+			if iname == "Hull Panels"				then tally.HullPanels = tally.HullPanels + qty / 15 end
+			if iname == "Guardian Processor Core"	then tally.GuardianProcessor = tally.GuardianProcessor + qty / 4 end
+			if iname == "Artemis Processor Core"	then tally.ArtemisProcessor = tally.ArtemisProcessor + qty / 8 end
+		end
+	end
+	for i, v in pairs(tally) do
+		console_print(i .. " -> " .. math.floor(v))
+		if math.floor(v) < lowest then
+			lowest = math.floor(v)
+			limiter = i
+		end
+	end
+	sectorprint("Can currently build maximum of " .. math.floor(lowest) .. " Superlights using current inventory in m14, limited by " .. limiter)
+end
+
+function harpo_rep(_, args)
+	local tally = {}
+	local location = ""
+	local iname = ""
+	local qty = 0
+	local lowest = 9999
+	local limiter = ""
+	tally.PowerRegulators = 0; 
+	tally.GuidedMissleCasings = 0; 
+	tally.SolidFuelPacks = 0; 
+	tally.AdvancedTargetingSystems = 0;
+	tally.Plasteel = 0; 
+	tally.Helio = 0; 
+	tally.Pentric = 0; 
+	tally.DentekProcessor = 0;
+	console_print("Item, Number of Repair Turrets worth of item...")
+	for i,v in PlayerInventoryPairs() do 
+		location = ShortLocationStr(SplitStationID(GetInventoryItemLocation(i)))
+		if location == "Latos I-8" then
+			iname = GetInventoryItemName(i)
+			qty = GetInventoryItemQuantity(i)
+			if iname == "Power Regulators"			then tally.PowerRegulators = tally.PowerRegulators + qty / 1 end
+			if iname == "Guided Missile Casings"	then tally.GuidedMissleCasings = tally.GuidedMissleCasings + qty / 6 end
+			if iname == "Solid Fuel Packs"			then tally.SolidFuelPacks = tally.SolidFuelPacks + qty / 6 end
+			if iname == "Advanced Targeting Systems" then tally.AdvancedTargetingSystems = tally.AdvancedTargetingSystems + qty / 1 end
+			if iname == "Plasteel"					then tally.Plasteel = tally.Plasteel + qty / 2 end
+			if iname == "Heliocene Ore"				then tally.Helio = tally.Helio + qty / 4 end
+			if iname == "Pentric Ore" 				then tally.Pentric = tally.Pentric + qty / 2 end
+			if iname == "Dentek Processor Core"	then tally.DentekProcessor = tally.DentekProcessor + qty / 1 end
+		end
+	end
+	for i, v in pairs(tally) do
+		console_print(i .. " -> " .. math.floor(v))
+		if math.floor(v) < lowest then
+			lowest = math.floor(v)
+			limiter = i
+		end
+	end
+	sectorprint("Can currently build maximum of " .. math.floor(lowest) .. " Repair Turrets using current inventory in i8, limited by " .. limiter)
+end
+
+function harpo_dbha(_, args)
+	local tally = {}
+	local location = ""
+	local iname = ""
+	local qty = 0
+	local lowest = 9999
+	local limiter = ""
+
+	-- Fused Composite Plating 	5
+	-- Internal Bulkhead Assembly 	2
+	-- Fluid Formable Silksteel Alloy 	2
+	-- Outer Hull Plate 	10
+	-- Data Link Connectors 	2
+	-- Engine Mounts 	32
+	-- Radiation Containment Kit 	16
+	-- Premium Ferric Ore 	131
+	-- Heliocene Ore 	4
+	-- Lanthanic Ore 	10
+	tally.FusedCompositePlating = 0; tally.InternalBulkheadAssembly = 0; tally.FluidFormableSilksteelAlloy = 0;
+	tally.OuterHullPlate = 0; tally.DataLinkConnectors = 0; tally.EngineMounts = 0; tally.RadiationContainmentKit = 0;
+	tally.PremiumFerricOre = 0; tally.HelioceneOre = 0; tally.LanthanicOre = 0;
+
+	console_print("Item, Number of DBHA worth of item...")
+	for i,v in PlayerInventoryPairs() do 
+		location = ShortLocationStr(SplitStationID(GetInventoryItemLocation(i)))
+		if location == "Bractus M-14" then
+			iname = GetInventoryItemName(i)
+			qty = GetInventoryItemQuantity(i)
+			if iname == "Fused Composite Plating" then tally.FusedCompositePlating = tally.FusedCompositePlating + qty / 5 end
+			if iname == "Internal Bulkhead Assembly" then tally.InternalBulkheadAssembly = tally.InternalBulkheadAssembly + qty / 2 end
+			if iname == "Fluid Formable Silksteel Alloy" then tally.FluidFormableSilksteelAlloy = tally.FluidFormableSilksteelAlloy + qty / 2 end
+			if iname == "Outer Hull Plate" then tally.OuterHullPlate = tally.OuterHullPlate + qty / 10 end
+			if iname == "Data Link Connectors" then tally.DataLinkConnectors = tally.DataLinkConnectors + qty / 2 end
+			if iname == "Engine Mounts" then tally.EngineMounts = tally.EngineMounts + qty / 32 end
+			if iname == "Radiation Containment Kit" then tally.RadiationContainmentKit = tally.RadiationContainmentKit + qty / 16 end
+			if iname == "Premium Ferric Ore" then tally.PremiumFerricOre = tally.PremiumFerricOre + qty / 131 end
+			if iname == "Heliocene Ore" then tally.HelioceneOre = tally.HelioceneOre + qty / 4 end
+			if iname == "Lanthanic Ore" then tally.LanthanicOre = tally.LanthanicOre + qty / 10 end
+		end
+	end
+	for i, v in pairs(tally) do
+		console_print(i .. " -> " .. math.floor(v))
+		if math.floor(v) < lowest then
+			lowest = math.floor(v)
+			limiter = i
+		end
+	end
+	sectorprint("Can currently build maximum of " .. math.floor(lowest) .. " DBHA using current inventory in M14, limited by " .. limiter)
+end
+
+function harpo_pylon(_, args)
+	local tally = {}
+	local location = ""
+	local iname = ""
+	local qty = 0
+	local lowest = 9999
+	local limiter = ""
+
+	tally.FusedCompositePlating = 0; tally.InternalBulkheadAssembly = 0; tally.FluidFormableSilksteelAlloy = 0;
+	tally.OuterHullPlate = 0; tally.DataLinkConnectors = 0; tally.EngineMounts = 0; tally.RadiationContainmentKit = 0;
+	tally.PremiumXithOre = 0; tally.HelioceneOre = 0; tally.LanthanicOre = 0;
+
+	console_print("Item, Number of Pylons worth of item...")
+	for i,v in PlayerInventoryPairs() do 
+		location = ShortLocationStr(SplitStationID(GetInventoryItemLocation(i)))
+		if location == "Pelatis C-12" then
+			iname = GetInventoryItemName(i)
+			qty = GetInventoryItemQuantity(i)
+			if iname == "Fused Composite Plating" then tally.FusedCompositePlating = tally.FusedCompositePlating + qty / 10 end
+			if iname == "Internal Bulkhead Assembly" then tally.InternalBulkheadAssembly = tally.InternalBulkheadAssembly + qty / 1 end
+			if iname == "Fluid Formable Silksteel Alloy" then tally.FluidFormableSilksteelAlloy = tally.FluidFormableSilksteelAlloy + qty / 5 end
+			if iname == "Outer Hull Plate" then tally.OuterHullPlate = tally.OuterHullPlate + qty / 60 end
+			if iname == "Data Link Connectors" then tally.DataLinkConnectors = tally.DataLinkConnectors + qty / 10 end
+			if iname == "Engine Mounts" then tally.EngineMounts = tally.EngineMounts + qty / 32 end
+			if iname == "Radiation Containment Kit" then tally.RadiationContainmentKit = tally.RadiationContainmentKit + qty / 16 end
+			if iname == "Heliocene Ore" then tally.HelioceneOre = tally.HelioceneOre + qty / 11 end
+			if iname == "Lanthanic Ore" then tally.LanthanicOre = tally.LanthanicOre + qty / 14 end
+		end
+	end
+	for i, v in pairs(tally) do
+		console_print(i .. " -> " .. math.floor(v))
+		if math.floor(v) < lowest then
+			lowest = math.floor(v)
+			limiter = i
+		end
+	end
+	sectorprint("Can currently build maximum of " .. math.floor(lowest) .. " Pylons using current inventory in C12, limited by " .. limiter)
+end
+
+function harpo_reactor(_, args)
+	local tally = {}
+	local location = ""
+	local iname = ""
+	local qty = 0
+	local lowest = 9999
+	local limiter = ""
+
+	tally.FusedCompositePlating = 0; tally.FluidFormableSilksteelAlloy = 0;tally.PremiumIshikOre = 0; 
+	tally.DataLinkConnectors = 0; tally.Coolant = 0; tally.PowerRegulators = 0; tally.Plasteel = 0; 
+	tally.EnergyConversionModules = 0; tally.RadiationContainmentKit = 0; tally.PremiumXithOre = 0; 
+	tally.PremiumFerricOre = 0; tally.PremiumCarbonicOre = 0; tally.HelioceneOre = 0; 
+	tally.LanthanicOre = 0; tally.SyntheticSilksteel = 0; tally.Samoflange = 0; 
+
+	console_print("Item, Number of Reactors worth of item...")
+	for i,v in PlayerInventoryPairs() do 
+		location = ShortLocationStr(SplitStationID(GetInventoryItemLocation(i)))
+		if location == "Pelatus C-12" then
+			iname = GetInventoryItemName(i)
+			qty = GetInventoryItemQuantity(i)
+			if iname == "Fused Composite Plating" then tally.FusedCompositePlating = tally.FusedCompositePlating + qty / 16 end
+			if iname == "Fluid Formable Silksteel Alloy" then tally.FluidFormableSilksteelAlloy = tally.FluidFormableSilksteelAlloy + qty / 20 end
+			if iname == "Radiation Containment Kit" then tally.RadiationContainmentKit = tally.RadiationContainmentKit + qty / 30 end
+			if iname == "Premium Ishik Ore" then tally.PremiumIshikOre = tally.PremiumIshikOre + qty / 19 end
+			if iname == "Heliocene Ore" then tally.HelioceneOre = tally.HelioceneOre + qty / 10 end
+			if iname == "Lanthanic Ore" then tally.LanthanicOre = tally.LanthanicOre + qty / 15 end
+			if iname == "Data Link Connectors" then tally.DataLinkConnectors = tally.DataLinkConnectors + qty / 64 end
+			if iname == "Coolant" then tally.Coolant = tally.Coolant + qty / 500 end
+			if iname == "Energy Conversion Module" then tally.EnergyConversionModules = tally.EnergyConversionModules + qty / 128 end
+			if iname == "Power Regulators" then tally.PowerRegulators = tally.PowerRegulators + qty / 256 end
+			if iname == "Plasteel" then tally.Plasteel = tally.Plasteel + qty / 60 end
+			if iname == "Premium Xithricite Ore" then tally.PremiumXithOre = tally.PremiumXithOre + qty / 50 end
+			if iname == "Premium Ferric Ore" then tally.PremiumFerricOre = tally.PremiumFerricOre + qty / 220 end
+			if iname == "Synthetic Silksteel" then tally.SyntheticSilksteel = tally.SyntheticSilksteel + qty / 15 end
+			if iname == "Premium Carbonic Ore" then tally.PremiumCarbonicOre = tally.PremiumCarbonicOre + qty / 180 end
+			if iname == "Samoflange" then tally.Samoflange = tally.Samoflange + qty / 1 end
+		end
+	end
+	for i, v in pairs(tally) do
+		console_print(i .. " -> " .. math.floor(v))
+		if math.floor(v) < lowest then
+			lowest = math.floor(v)
+			limiter = i
+		end
+	end
+	sectorprint("Can currently build maximum of " .. math.floor(lowest) .. " Reactors using current inventory in C12, limited by " .. limiter)
+end
+
+function harpo_mos(_, args)
+	local tally = {}
+	local location = ""
+	local iname = ""
+	local qty = 0
+	local lowest = 9999
+	local limiter = ""
+	tally.MilanarObserverOptics = 0; tally.DataLinkConnectors = 0; tally.Optics = 0; tally.ThermalInsulatorTiles = 0; 
+	tally.BasicTargetingSystems = 0; tally.Plasteel = 0; tally.Apicene = 0; tally.Denic = 0; tally.ThermalImagers = 0; 
+	tally.ScannerCircutBoards = 0; tally.UnassembledCargoCrates = 0;
+	console_print("Item, Number of Milanar Optical Sensors worth of item...")
+	for i,v in PlayerInventoryPairs() do 
+		location = ShortLocationStr(SplitStationID(GetInventoryItemLocation(i)))
+
+		--iname = GetInventoryItemName(i)
+		--qty = GetInventoryItemQuantity(i)
+		--console_print(iname, location, qty)
+
+		if location == "Bractus M-14" then
+			iname = GetInventoryItemName(i)
+			qty = GetInventoryItemQuantity(i)
+			if iname == "Milanar Observer Optics"	then tally.MilanarObserverOptics = tally.MilanarObserverOptics + qty / 2 end
+			if iname == "Data Link Connectors"		then tally.DataLinkConnectors = tally.DataLinkConnectors + qty / 16 end
+			if iname == "Optics"					then tally.Optics = tally.Optics + qty / 20 end
+			if iname == "Thermal Insulator Tiles"	then tally.ThermalInsulatorTiles = tally.ThermalInsulatorTiles + qty / 10 end
+			if iname == "Basic Targeting Systems"	then tally.BasicTargetingSystems = tally.BasicTargetingSystems + qty / 4 end
+			if iname == "Plasteel"					then tally.Plasteel = tally.Plasteel + qty / 200 end
+			if iname == "Apicene Ore"				then tally.Apicene = tally.Apicene + qty / 17 end
+			if iname == "Denic Ore"					then tally.Denic = tally.Denic + qty / 6 end
+			if iname == "Thermal Imagers"			then tally.ThermalImagers = tally.ThermalImagers + qty / 2 end
+			if iname == "Scanner Circuit Boards"	then tally.ScannerCircutBoards = tally.ScannerCircutBoards + qty / 4 end
+			if iname == "Unassembled Cargo Crates"	then tally.UnassembledCargoCrates = tally.UnassembledCargoCrates + qty / 1 end
+		end
+	end
+	for i, v in pairs(tally) do
+		console_print(i .. " -> " .. math.floor(v))
+		if math.floor(v) < lowest then
+			lowest = math.floor(v)
+			limiter = i
+		end
+	end
+	sectorprint("Can currently build maximum of " .. math.floor(lowest) .. " Milanar Optical Sensors using current inventory in M14, limited by " .. limiter)
 end
 
 RegisterUserCommand("goli", harpo_goli)
@@ -635,3 +959,11 @@ RegisterUserCommand("eha", harpo_eha)
 RegisterUserCommand("mmc", harpo_mmc)
 RegisterUserCommand("cwm", harpo_cwm)
 RegisterUserCommand("ihdpc", harpo_ihdpc)
+RegisterUserCommand("superlight", harpo_superlight)
+RegisterUserCommand("sl", harpo_superlight)
+RegisterUserCommand("rep", harpo_rep)
+RegisterUserCommand("engine", harpo_engine)
+RegisterUserCommand("dbha", harpo_dbha)
+RegisterUserCommand("pylon", harpo_pylon)
+RegisterUserCommand("reactor", harpo_reactor)
+RegisterUserCommand("mos", harpo_mos)
