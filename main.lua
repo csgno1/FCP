@@ -2,14 +2,14 @@
 
 -- VO manufacturing helper plugin, mainly for items where many of the same are needed
 
--- version: 1.15 2026/02/14 - Bug fixes for the /goli section
--- version: 1.14 2024/01/12 - added /dbha (beta)
+-- version: 1.15 2026/02/14 - Bug fixes
+-- version: 1.14 2024/01/12 - added /dbha for docking bay hanger assembly and /mos for the milinar optical sensor
 -- version: 1.13 2024/01/07 - added /engine
--- version: 1.12 2023/01/26 - added Goliath /goli (beta)
--- version: 1.11 2021/09/21 - added PCB
--- version: 1.10 2017/12/13 - added IHDPC
--- version: 1.09 2016/11/03 - added TU mine launchers
--- version: 1.08 2015/01/14 - added Corvus Widowmakers
+-- version: 1.12 2023/01/26 - added Goliath /goli
+-- version: 1.11 2021/09/21 - added PCB turrets: /pcb
+-- version: 1.10 2017/12/13 - added /ihdpc
+-- version: 1.09 2016/11/03 - added /TU mine launchers
+-- version: 1.08 2015/01/14 - added Corvus Widowmakers: /cwm
 -- version: 1.07 2014/12/06 - added Milanar Master Computing System: /mmc
 -- version: 1.06 2014/12/05 - added External Hull Assembly: /eha
 -- version: 1.05 2014/12/02 - Bug fixes, big nasty bugs
@@ -21,7 +21,6 @@
 
 -- Planned improvements:
 --	/TTM command for final trident mission
---	/reactor
 
 -- Dependancies: none
 
