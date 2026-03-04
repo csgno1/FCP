@@ -11,11 +11,15 @@ Enter any one of the following commands in the chat window...
 * /rb or /rib
 * /fc or /firecracker
 * /mca
+* /mmc
 * /iba
 * /eha
 * /tu
 * /ihdpc
 * /goli
+* /dbha
+* /mos
+* /engine
 
 For corvus widowmakers the station is the parameter: /cwm "Bractus D-9"
 
